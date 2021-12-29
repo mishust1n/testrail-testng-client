@@ -2,8 +2,8 @@ plugins {
     id 'java'
     id "org.sonarqube" version "3.3"
     id 'jacoco'
-    id 'maven'
     id 'signing'
+    id 'maven-publish'
 }
 
 group 'io.mishustin'
@@ -54,11 +54,7 @@ signing {
 uploadArchives {
     repositories {
         mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            println 'test'
-            println ossrhUsername
-            println ossrhPassword
+            beforeDeployment { MavenPublication deployment -> signing.signPom(deployment) }
 
             repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
                 authentication(userName: ossrhUsername, password: ossrhPassword)
