@@ -1,0 +1,101 @@
+plugins {
+    id 'java'
+    id "org.sonarqube" version "3.3"
+    id 'jacoco'
+    id 'maven'
+    id 'signing'
+}
+
+group 'io.mishustin'
+version '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.testng', name: 'testng', version: '7.4.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
+    implementation group: 'org.json', name: 'json', version: '20211205'
+}
+
+test {
+    finalizedBy jacocoTestReport
+    useTestNG();
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mishust1n_testrail-testng-client"
+        property "sonar.organization", "mishust1n"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            println 'test'
+            println ossrhUsername
+            println ossrhPassword
+
+            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Testrail-TestNg-Client'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Set of tools for the test automation projects'
+                url 'https://github.com/mishust1n/qa-toolbox'
+
+                scm {
+                    connection 'scm:https://github.com/mishust1n/qa-toolbox.git'
+                    developerConnection 'scm:git:https://github.com/mishust1n/qa-toolbox.git'
+                    url 'scm:git:https://github.com/mishust1n/qa-toolbox.git'
+                }
+
+                licenses {
+                    license {
+                        name 'GNU General Public License'
+                        url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'mishust1n'
+                        name 'Artur Mishustin'
+                        email 'artur@mishustin.io'
+                    }
+                }
+            }
+        }
+    }
+}
