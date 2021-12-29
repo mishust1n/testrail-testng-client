@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id "org.sonarqube" version "3.3"
     id 'jacoco'
     id 'signing'
@@ -25,6 +25,11 @@ test {
     useTestNG();
 }
 
+java{
+    withJavadocJar()
+    withSourcesJar()
+}
+
 sonarqube {
     properties {
         property "sonar.projectKey", "mishust1n_testrail-testng-client"
@@ -33,64 +38,54 @@ sonarqube {
     }
 }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
 signing {
-    sign configurations.archives
+    sign(publishing.publications)
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenPublication deployment -> signing.signPom(deployment) }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            pom {
 
-            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'Testrail-TestNg-Client'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'Set of tools for the test automation projects'
-                url 'https://github.com/mishust1n/qa-toolbox'
-
-                scm {
-                    connection 'scm:https://github.com/mishust1n/qa-toolbox.git'
-                    developerConnection 'scm:git:https://github.com/mishust1n/qa-toolbox.git'
-                    url 'scm:git:https://github.com/mishust1n/qa-toolbox.git'
+                description = 'Testrail client for the testNg'
+                name = 'Testrail-TestNg-client'
+                url = 'https://github.com/mishust1n/qa-toolbox'
+                organization {
+                    name = 'io.mishustin'
+                    url = 'https://github.com/mishust1n'
                 }
 
                 licenses {
                     license {
-                        name 'GNU General Public License'
-                        url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                        name = 'GNU General Public License'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
                     }
+                }
+
+                scm {
+                    connection = 'scm:https://github.com/mishust1n/testrail-testng-client.git'
+                    developerConnection = 'scm:git:https://github.com/mishust1n/testrail-testng-client.git'
+                    url = 'scm:git:https://github.com/mishust1n/testrail-testng-client.git'
                 }
 
                 developers {
                     developer {
-                        id 'mishust1n'
-                        name 'Artur Mishustin'
-                        email 'artur@mishustin.io'
+                        id = 'mishust1n'
+                        name = 'Artur Mishustin'
+                        email = 'artur@mishustin.io'
                     }
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
             }
         }
     }
