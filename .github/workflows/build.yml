@@ -31,7 +31,9 @@ jobs:
       - name: Restore gradle.properties
         env:
           GRADLE_PROPERTIES: ${{ secrets.GRADLE_SECRET }}
-        run: echo ${GRADLE_SECRET} > ./gradle.properties && cat ./gradle.properties
+        run: echo ${GRADLE_SECRET} > ./gradle.properties
+      - name: Restore gradle.properties1111
+        run: cat ./gradle.properties
       - name: Get gradlew
         run: gradle wrapper
       - name: Make gradlew executable
