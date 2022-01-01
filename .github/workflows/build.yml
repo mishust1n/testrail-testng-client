@@ -6,7 +6,7 @@ on:
     types: [ opened, synchronize, reopened ]
 jobs:
   build:
-    name: Build
+    name: Run Sonar Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
       - name: Restore gradle.properties
         env:
           GRADLE_PROPERTIES: ${{ secrets.GRADLE_SECRET }}
-        run: echo ${GRADLE_SECRET} > ./gradle.properties
+        run: echo ${GRADLE_SECRET} > ./gradle.properties && cat ./gradle.properties
       - name: Get gradlew
         run: gradle wrapper
       - name: Make gradlew executable
